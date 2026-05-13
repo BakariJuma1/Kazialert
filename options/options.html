@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kazi Alert — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+<div class="page">
+
+  <header class="page-header">
+    <div class="logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">Kazi Alert</span>
+      <span class="logo-sub">Settings</span>
+    </div>
+  </header>
+
+  <!-- ── 1. Your CV ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">📄</span>
+      <span class="section-title">Your CV</span>
+      <span class="section-badge section-badge--warn hidden" id="cvBadgeWarn">Not uploaded</span>
+      <span class="section-badge section-badge--ok hidden"   id="cvBadgeOk">Uploaded</span>
+    </div>
+    <div class="section-body">
+
+      <div class="cv-status-bar">
+        <div class="cv-status-info">
+          <span class="dot dot--off" id="cvDot"></span>
+          <span id="cvStatusText">No CV stored</span>
+        </div>
+        <button class="btn btn--ghost btn--sm hidden" id="clearCvBtn">Remove</button>
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="cvFile" accept=".pdf,.txt,.doc">
+        <div class="drop-zone-text">Drop your CV here or <span id="browseLink">browse</span></div>
+        <div class="drop-zone-sub">PDF, TXT or DOC — stays on your device, never shared</div>
+      </div>
+
+      <div class="or-divider">or paste text</div>
+
+      <div class="field">
+        <textarea id="cvText" placeholder="Paste your full CV text here…"></textarea>
+      </div>
+
+      <button class="btn btn--primary btn--full" id="saveCvBtn">
+        <span id="saveCvLabel">Save CV</span>
+        <span class="spinner hidden" id="saveCvSpinner"></span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ── 2. Alert Email ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">✉️</span>
+      <span class="section-title">Alert Email</span>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="field-label" for="alertEmail">Where to send job matches</label>
+        <input type="email" id="alertEmail" placeholder="you@example.com">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Scan Settings ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <span class="section-title">Scan Settings</span>
+    </div>
+    <div class="section-body">
+
+      <div class="two-col">
+        <div class="field">
+          <label class="field-label" for="checkInterval">Check interval</label>
+          <select id="checkInterval">
+            <option value="2">Every 2 hours</option>
+            <option value="6">Every 6 hours</option>
+            <option value="12">Every 12 hours</option>
+            <option value="24">Every 24 hours</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="locationFilter">Location scope</label>
+          <select id="locationFilter">
+            <option value="both">Kenya + Remote</option>
+            <option value="kenya">Kenya only</option>
+            <option value="remote">Remote only</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Match threshold — <span id="thresholdLabel">60%</span></label>
+        <div class="range-row">
+          <input type="range" id="matchThreshold" min="50" max="95" step="5" value="60">
+          <span class="range-value" id="thresholdValue">60%</span>
+        </div>
+        <span class="field-hint">Only jobs scoring above this trigger an email alert</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="jobTypeFilter">Job type</label>
+        <select id="jobTypeFilter">
+          <option value="all">All types</option>
+          <option value="full-time">Full time</option>
+          <option value="part-time">Part time</option>
+          <option value="internship">Internship</option>
+          <option value="contract">Contract</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label toggle-label">
+          <span>Digest mode</span>
+          <label class="toggle">
+            <input type="checkbox" id="digestMode">
+            <span class="toggle-slider"></span>
+          </label>
+        </label>
+        <span class="field-hint">Batch all matches into one email per scan instead of per-job alerts</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 4. API Keys ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🔑</span>
+      <span class="section-title">API Keys</span>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="field-label" for="groqKey">Groq API Key</label>
+        <input type="password" id="groqKey" placeholder="gsk_…">
+        <span class="field-hint">Free at console.groq.com — powers AI job matching</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label">EmailJS</label>
+        <span class="field-hint">From your EmailJS dashboard — sends the match email alerts</span>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+          <input type="text" id="emailjsService"        placeholder="Service ID        (e.g. service_abc123)">
+          <input type="text" id="emailjsTemplate"       placeholder="Per-job Template  (e.g. template_xyz789)">
+          <input type="text" id="emailjsDigestTemplate" placeholder="Digest Template   (e.g. template_digest01) — for digest mode">
+          <input type="text" id="emailjsUser"           placeholder="Public Key        (e.g. user_XXXXXX)">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 5. Custom Career Pages ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">🏢</span>
+      <span class="section-title">Custom Career Pages</span>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="field-label">Add a company careers page</label>
+        <div class="url-add-row">
+          <input type="text" id="urlLabel" class="label-input" placeholder="Label (e.g. Equity Bank)">
+          <input type="url"  id="urlInput" class="url-input"   placeholder="https://company.com/careers">
+          <button class="btn btn--ghost btn--sm" id="addUrlBtn">Add</button>
+        </div>
+      </div>
+
+      <div class="url-list" id="urlList">
+        <div class="url-empty">No custom pages added yet</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 6. Match History ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <span class="section-title">Match History</span>
+      <button class="section-action" id="clearHistoryBtn">Clear all</button>
+    </div>
+    <div class="section-body">
+      <div class="history-list" id="historyList">
+        <div class="history-empty">No matches yet — run a scan to find jobs</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="options.js"></script>
+</body>
+</html>
