@@ -3,42 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kazi Alert — Settings</title>
+  <title>Kazi Alert   Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
+
+<!-- ── SVG icon sprite ────────────────────────────────────────────────────── -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden;">
+  <defs>
+    <symbol id="ic-zap"        viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="ic-file"       viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="ic-mail"       viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+    <symbol id="ic-sliders"    viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    <symbol id="ic-key"        viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
+    <symbol id="ic-building"   viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="ic-clipboard"  viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></symbol>
+    <symbol id="ic-table"      viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></symbol>
+    <symbol id="ic-terminal"   viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+    <symbol id="ic-upload"     viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+    <symbol id="ic-check"      viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="ic-check-sq"   viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+    <symbol id="ic-external"   viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+    <symbol id="ic-trash"      viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="ic-plus"       viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="ic-pause"      viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+    <symbol id="ic-play"       viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+    <symbol id="ic-info"       viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+    <symbol id="ic-x"          viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="ic-copy"       viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="ic-send"       viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="ic-briefcase"  viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+  </defs>
+</svg>
+
 <div class="page">
 
   <header class="page-header">
     <div class="logo">
-      <span class="logo-icon">⚡</span>
-      <span class="logo-text">Kazi Alert</span>
-      <span class="logo-sub">Settings</span>
+      <div class="logo-mark">
+        <svg class="icon" aria-hidden="true"><use href="#ic-zap"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">Kazi Alert</div>
+        <div class="logo-sub">Settings</div>
+      </div>
     </div>
   </header>
 
-  <!-- ── 1. Your CV ── -->
+  <!-- ── 1. Your CV ──────────────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">📄</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-file"/></svg></div>
       <span class="section-title">Your CV</span>
       <span class="section-badge section-badge--warn hidden" id="cvBadgeWarn">Not uploaded</span>
-      <span class="section-badge section-badge--ok hidden"   id="cvBadgeOk">Uploaded</span>
+      <span class="section-badge section-badge--ok  hidden" id="cvBadgeOk">Uploaded</span>
     </div>
     <div class="section-body">
 
-      <div class="cv-status-bar">
-        <div class="cv-status-info">
+      <div class="status-bar">
+        <div class="status-bar-left">
           <span class="dot dot--off" id="cvDot"></span>
           <span id="cvStatusText">No CV stored</span>
         </div>
-        <button class="btn btn--ghost btn--sm hidden" id="clearCvBtn">Remove</button>
+        <button class="btn btn--ghost btn--sm hidden" id="clearCvBtn">
+          <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-x"/></svg>
+          Remove
+        </button>
       </div>
 
       <div class="drop-zone" id="dropZone">
         <input type="file" id="cvFile" accept=".pdf,.txt,.doc">
+        <div class="drop-zone-icon"><svg class="icon icon-lg" aria-hidden="true"><use href="#ic-upload"/></svg></div>
         <div class="drop-zone-text">Drop your CV here or <span id="browseLink">browse</span></div>
-        <div class="drop-zone-sub">PDF, TXT or DOC — stays on your device, never shared</div>
+        <div class="drop-zone-sub">PDF, TXT or DOC — stays on your device, never uploaded</div>
       </div>
 
       <div class="or-divider">or paste text</div>
@@ -48,6 +85,7 @@
       </div>
 
       <button class="btn btn--primary btn--full" id="saveCvBtn">
+        <svg class="icon" aria-hidden="true"><use href="#ic-check"/></svg>
         <span id="saveCvLabel">Save CV</span>
         <span class="spinner hidden" id="saveCvSpinner"></span>
       </button>
@@ -55,10 +93,10 @@
     </div>
   </div>
 
-  <!-- ── 2. Alert Email ── -->
+  <!-- ── 2. Alert Email ──────────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">✉️</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-mail"/></svg></div>
       <span class="section-title">Alert Email</span>
     </div>
     <div class="section-body">
@@ -69,10 +107,10 @@
     </div>
   </div>
 
-  <!-- ── 3. Scan Settings ── -->
+  <!-- ── 3. Scan Settings ────────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">⚙️</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-sliders"/></svg></div>
       <span class="section-title">Scan Settings</span>
     </div>
     <div class="section-body">
@@ -131,10 +169,10 @@
     </div>
   </div>
 
-  <!-- ── 4. API Keys ── -->
+  <!-- ── 4. API Keys ─────────────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">🔑</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-key"/></svg></div>
       <span class="section-title">API Keys</span>
     </div>
     <div class="section-body">
@@ -142,27 +180,25 @@
       <div class="field">
         <label class="field-label" for="groqKey">Groq API Key</label>
         <input type="password" id="groqKey" placeholder="gsk_…">
-        <span class="field-hint">Free at console.groq.com — powers AI job matching</span>
+        <span class="field-hint">Free at <strong>console.groq.com</strong> — powers AI job matching</span>
       </div>
 
       <div class="field">
-        <label class="field-label">EmailJS</label>
-        <span class="field-hint">From your EmailJS dashboard — sends the match email alerts</span>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-          <input type="text" id="emailjsService"        placeholder="Service ID        (e.g. service_abc123)">
-          <input type="text" id="emailjsTemplate"       placeholder="Per-job Template  (e.g. template_xyz789)">
-          <input type="text" id="emailjsDigestTemplate" placeholder="Digest Template   (e.g. template_digest01) — for digest mode">
-          <input type="text" id="emailjsUser"           placeholder="Public Key        (e.g. user_XXXXXX)">
+        <label class="field-label">Resend</label>
+        <span class="field-hint">Free at <strong>resend.com</strong> — sends rich HTML job alert emails</span>
+        <div class="input-stack">
+          <input type="password" id="resendKey"  placeholder="API Key  (re_…)">
+          <input type="text"     id="resendFrom" placeholder="From email — leave blank to use onboarding@resend.dev">
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- ── 5. Custom Career Pages ── -->
+  <!-- ── 5. Custom Career Pages ──────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">🏢</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-building"/></svg></div>
       <span class="section-title">Custom Career Pages</span>
     </div>
     <div class="section-body">
@@ -172,32 +208,155 @@
         <div class="url-add-row">
           <input type="text" id="urlLabel" class="label-input" placeholder="Label (e.g. Equity Bank)">
           <input type="url"  id="urlInput" class="url-input"   placeholder="https://company.com/careers">
-          <button class="btn btn--ghost btn--sm" id="addUrlBtn">Add</button>
+          <button class="btn btn--ghost btn--sm" id="addUrlBtn">
+            <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-plus"/></svg>
+            Add
+          </button>
         </div>
       </div>
 
       <div class="url-list" id="urlList">
-        <div class="url-empty">No custom pages added yet</div>
+        <div class="list-empty">No custom pages added yet</div>
       </div>
 
     </div>
   </div>
 
-  <!-- ── 6. Match History ── -->
+  <!-- ── 6. Match History ────────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <span class="section-icon">📋</span>
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-clipboard"/></svg></div>
       <span class="section-title">Match History</span>
       <button class="section-action" id="clearHistoryBtn">Clear all</button>
     </div>
     <div class="section-body">
       <div class="history-list" id="historyList">
-        <div class="history-empty">No matches yet — run a scan to find jobs</div>
+        <div class="list-empty">No matches yet — run a scan to find jobs</div>
       </div>
     </div>
   </div>
 
-</div>
+  <!-- ── 7. Job Tracker ──────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon-wrap section-icon-wrap--accent"><svg class="icon" aria-hidden="true"><use href="#ic-table"/></svg></div>
+      <span class="section-title">Job Tracker</span>
+      <span class="section-badge section-badge--ok hidden" id="trackerConnected">Connected</span>
+    </div>
+    <div class="section-body">
+
+      <div class="info-box">
+        <svg class="icon info-box-icon" aria-hidden="true"><use href="#ic-info"/></svg>
+        <div>
+          <div class="info-box-title">Log every application to your Google Sheet</div>
+          <div class="info-box-body">Click "Mark Applied" on any match, or use the quick form below to log jobs you applied to outside the extension. Rows appear in your sheet instantly.</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="sheetsUrl">Google Apps Script URL</label>
+        <div class="input-with-action">
+          <input type="url" id="sheetsUrl" placeholder="https://script.google.com/macros/s/…/exec">
+          <button class="btn btn--ghost btn--sm" id="testSheetBtn">Test</button>
+        </div>
+        <span class="field-hint">Paste the Web App URL from your Apps Script deployment</span>
+      </div>
+
+      <!-- Setup guide -->
+      <details class="setup-guide" id="setupGuide">
+        <summary class="setup-summary">
+          <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-info"/></svg>
+          How to set this up — 3 steps
+          <svg class="icon icon-xs chevron" aria-hidden="true"><use href="#ic-plus"/></svg>
+        </summary>
+        <div class="setup-body">
+          <ol class="setup-steps">
+            <li>Open your Google Sheet → <strong>Extensions → Apps Script</strong></li>
+            <li>Delete the default code, paste the script below, and save (<kbd>Ctrl+S</kbd>)</li>
+            <li>Click <strong>Deploy → New deployment → Web App</strong>. Set "Execute as: <em>Me</em>" and "Who has access: <em>Anyone</em>". Copy the URL and paste above.</li>
+          </ol>
+          <div class="code-block">
+            <div class="code-header">
+              <span>Apps Script — paste this into your sheet</span>
+              <button class="btn btn--ghost btn--xs" id="copyScriptBtn">
+                <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-copy"/></svg>
+                Copy
+              </button>
+            </div>
+<pre class="code-body">function doGet(e) {
+  var p = (e && e.parameter) ? e.parameter : {};
+  if (p.job) {
+    try {
+      SpreadsheetApp.getActiveSpreadsheet()
+        .getActiveSheet()
+        .appendRow([
+          p.company||'', p.job||'', p.date||'',
+          '','','','','','','',''
+        ]);
+      return _json({ok:true, written:true});
+    } catch(err) {
+      return _json({ok:false, e:err.toString()});
+    }
+  }
+  return _json({ok:true, written:false, service:'Kazi Alert'});
+}
+function doPost(e) {
+  try {
+    var d = JSON.parse(e.postData.contents);
+    if (d.job) {
+      SpreadsheetApp.getActiveSpreadsheet()
+        .getActiveSheet()
+        .appendRow([d.company||'', d.job||'', d.date||'',
+          '','','','','','','','']);
+      return _json({ok:true, written:true});
+    }
+  } catch(_) {}
+  return doGet(e);
+}
+function _json(d) {
+  return ContentService
+    .createTextOutput(JSON.stringify(d))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+          </div>
+        </div>
+      </details>
+
+      <!-- Manual log form -->
+      <div class="manual-log">
+        <div class="manual-log-title">
+          <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-briefcase"/></svg>
+          Log a job manually
+        </div>
+        <div class="manual-log-row">
+          <input type="text" id="manualCompany" placeholder="Company">
+          <input type="text" id="manualJob"     placeholder="Job title">
+          <input type="date" id="manualDate">
+          <button class="btn btn--primary btn--sm" id="manualLogBtn">
+            <svg class="icon icon-xs" aria-hidden="true"><use href="#ic-send"/></svg>
+            Log
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 8. Scan Logs ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon-wrap"><svg class="icon" aria-hidden="true"><use href="#ic-terminal"/></svg></div>
+      <span class="section-title">Scan Logs</span>
+      <button class="section-action" id="clearLogsBtn">Clear</button>
+    </div>
+    <div class="section-body">
+      <div class="logs-list" id="logsList">
+        <div class="list-empty">No logs yet — logs appear here after each scan</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.page -->
 
 <div class="toast" id="toast"></div>
 <script type="module" src="options.js"></script>

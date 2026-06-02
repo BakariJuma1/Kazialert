@@ -30,7 +30,7 @@
     }
   ],
   "options_page": "options/options.html",
-  "permissions": ["storage", "alarms", "scripting", "tabs", "notifications"],
+  "permissions": ["storage", "alarms", "scripting", "tabs", "notifications", "offscreen"],
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "icons/icon16.png",

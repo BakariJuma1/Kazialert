@@ -1,6 +1,5 @@
 import { JOB_BOARDS } from '../sites/job-boards.js';
 import { COMPANY_PAGES } from '../sites/company-pages.js';
-import { detectJobListings } from '../sites/selector-detector.js';
 import { normalizeJob } from '../utils/job-parser.js';
 import { Storage, STORAGE_KEYS, DEFAULTS } from '../utils/storage.js';
 
@@ -34,7 +33,6 @@ async function scrapeTier1(locationFilter) {
 
 async function scrapeTier2(locationFilter) {
   const pages = COMPANY_PAGES.filter(p => matchesLocationFilter(p.region, locationFilter));
-  // Batch to avoid overwhelming the network — 5 at a time
   const jobs = [];
   for (let i = 0; i < pages.length; i += 5) {
     const batch = pages.slice(i, i + 5);
@@ -66,13 +64,11 @@ async function scrapeBoard(board) {
 
   let rawJobs;
   if (board.type === 'json') {
+    // JSON boards parse inline — no DOM needed
     rawJobs = board.parse(JSON.parse(html));
-  } else if (board.type === 'rss') {
-    const doc = new DOMParser().parseFromString(html, 'text/xml');
-    rawJobs = board.parse(doc);
   } else {
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    rawJobs = board.parse(doc);
+    // RSS/HTML boards need a DOM — delegate to the offscreen document
+    rawJobs = await offscreenParseBoard(board.name, html);
   }
 
   return rawJobs.map(j => normalizeJob({ ...j, source: j.source || board.name }));
@@ -80,10 +76,38 @@ async function scrapeBoard(board) {
 
 async function scrapeCareerPage(url, sourceName) {
   const html = await fetchPage(url);
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const rawJobs = detectJobListings(doc, url);
+  const rawJobs = await offscreenParseCareer(html, url);
   return rawJobs.map(j => normalizeJob({ ...j, source: sourceName }));
 }
+
+// ── Offscreen helpers ────────────────────────────────────────────────────────
+
+function offscreenParseBoard(boardName, html) {
+  return offscreenMsg({ type: 'PARSE_BOARD', boardName, html });
+}
+
+function offscreenParseCareer(html, url) {
+  return offscreenMsg({ type: 'PARSE_CAREER', html, url });
+}
+
+function offscreenMsg(payload) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { target: 'offscreen', ...payload },
+      response => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (!response?.ok) {
+          reject(new Error(response?.error || 'Offscreen parse failed'));
+        } else {
+          resolve(response.jobs);
+        }
+      }
+    );
+  });
+}
+
+// ── Fetch ────────────────────────────────────────────────────────────────────
 
 async function fetchPage(url, extraHeaders = {}) {
   const controller = new AbortController();
@@ -104,8 +128,8 @@ async function fetchPage(url, extraHeaders = {}) {
 }
 
 function matchesLocationFilter(source, filter) {
-  if (filter === 'both') return true;
-  if (filter === 'kenya') return source === 'kenya' || source === 'both';
+  if (filter === 'both')   return true;
+  if (filter === 'kenya')  return source === 'kenya'  || source === 'both';
   if (filter === 'remote') return source === 'remote' || source === 'both';
   return true;
 }

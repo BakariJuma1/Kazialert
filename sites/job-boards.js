@@ -19,7 +19,7 @@ export const JOB_BOARDS = [
         jobType: 'full-time',
         applyUrl: j.url || `https://remoteok.com/jobs/${j.id}`,
         deadline: null,
-        postedAt: j.date ? new Date(j.date * 1000).toISOString() : null,
+        postedAt: j.date ? (() => { try { return new Date(Number(j.date) * 1000).toISOString(); } catch { return null; } })() : null,
         source: 'RemoteOK',
       }));
     },
@@ -75,7 +75,7 @@ export const JOB_BOARDS = [
 
   {
     name: 'BrighterMonday Kenya',
-    url: 'https://www.brightermonday.co.ke/listings',
+    url: 'https://www.brightermonday.co.ke/jobs',
     type: 'html',
     location: 'kenya',
     parse(doc) {

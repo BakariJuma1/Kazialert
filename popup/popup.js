@@ -7,53 +7,40 @@ document.addEventListener('DOMContentLoaded', async () => {
   bindEvents();
 });
 
-// ── Status load ───────────────────────────────────────────────────────────────
-
 async function loadStatus() {
   try {
-    const [status, email] = await Promise.all([
+    const [status, email, appliedJobs] = await Promise.all([
       sendMessage({ type: 'GET_STATUS' }),
       Storage.getOne(STORAGE_KEYS.EMAIL),
+      Storage.getOne(STORAGE_KEYS.APPLIED_JOBS, {}),
     ]);
-    renderStatus(status, email);
+    renderStatus(status, email, appliedJobs);
   } catch {
-    // Service worker sleeping — read storage directly as fallback
-    const [cv, email, lastCheck, stats] = await Promise.all([
+    const [cv, email, lastCheck, stats, appliedJobs] = await Promise.all([
       Storage.getOne(STORAGE_KEYS.CV),
       Storage.getOne(STORAGE_KEYS.EMAIL),
       Storage.getOne(STORAGE_KEYS.LAST_CHECK),
       Storage.getOne(STORAGE_KEYS.STATS, { ...DEFAULTS.STATS }),
+      Storage.getOne(STORAGE_KEYS.APPLIED_JOBS, {}),
     ]);
-    renderStatus({ hasCV: !!cv, hasEmail: !!email, lastCheck, stats }, email);
+    renderStatus({ hasCV: !!cv, hasEmail: !!email, lastCheck, stats }, email, appliedJobs);
   }
 }
 
-function renderStatus({ hasCV, hasEmail, lastCheck, stats }, email) {
-  // CV indicator
-  if (hasCV) {
-    $('cvDot').className = 'dot dot--on';
-    $('cvLabel').textContent = 'CV uploaded';
-  } else {
-    $('cvDot').className = 'dot dot--off';
-    $('cvLabel').textContent = 'No CV uploaded';
-  }
+function renderStatus({ hasCV, hasEmail, lastCheck, stats }, email, appliedJobs) {
+  $('cvDot').className   = `dot ${hasCV ? 'dot--on' : 'dot--off'}`;
+  $('cvLabel').textContent = hasCV ? 'CV uploaded' : 'No CV uploaded';
 
-  // Alert email
   $('emailValue').textContent = email || 'Not set';
 
-  // Stats
-  $('statTotal').textContent = stats?.totalMatched ?? 0;
-  $('statWeek').textContent = stats?.emailsSentWeek ?? 0;
+  $('statTotal').textContent     = stats?.totalMatched    ?? 0;
+  $('statWeek').textContent      = stats?.emailsSentWeek  ?? 0;
+  $('statApplied').textContent   = Object.keys(appliedJobs || {}).length;
   $('statLastCheck').textContent = timeAgo(lastCheck);
 
-  // Setup banner
   $('setupBanner').classList.toggle('hidden', hasCV && hasEmail);
-
-  // Check Now only usable when fully configured
   $('checkBtn').disabled = !hasCV || !hasEmail;
 }
-
-// ── Events ────────────────────────────────────────────────────────────────────
 
 function bindEvents() {
   const openOptions = e => { e?.preventDefault(); chrome.runtime.openOptionsPage(); };
@@ -64,32 +51,26 @@ function bindEvents() {
 
   $('checkBtn').addEventListener('click', async () => {
     setScanning(true);
-    try {
-      await sendMessage({ type: 'MANUAL_SCAN' });
-    } catch (err) {
-      console.error('[Kazi Alert] Manual scan failed:', err.message);
-    }
+    try { await sendMessage({ type: 'MANUAL_SCAN' }); } catch {}
     setScanning(false);
     await loadStatus();
   });
 }
 
 function setScanning(active) {
-  $('checkBtn').disabled = active;
-  $('checkLabel').textContent = active ? 'Scanning…' : 'Check Now';
+  $('checkBtn').disabled   = active;
+  $('checkLabel').textContent = active ? 'Scanning…' : 'Scan Now';
   $('checkSpinner').classList.toggle('hidden', !active);
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function timeAgo(iso) {
   if (!iso) return '—';
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (m < 1) return 'Now';
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `${m}m ago`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  return `${Math.floor(h / 24)}d`;
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
 function sendMessage(msg) {
