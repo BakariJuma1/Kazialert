@@ -30,6 +30,7 @@
     }
   ],
   "options_page": "options/options.html",
+  "homepage_url": "https://github.com/BakariJuma1/Kazialert",
   "permissions": ["storage", "alarms", "scripting", "tabs", "notifications", "offscreen"],
   "host_permissions": ["<all_urls>"],
   "icons": {

@@ -1,3 +1,26 @@
+/* ── Privacy notice ──────────────────────────────────────────────────────── */
+.privacy-notice {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  background: rgba(0,208,132,0.05);
+  border: 1px solid rgba(0,208,132,0.2);
+  border-radius: var(--radius, 8px);
+  padding: 11px 14px;
+  margin-bottom: 20px;
+  font-size: 12px; color: var(--text-2, #94a3b8); line-height: 1.5;
+}
+.privacy-notice.hidden { display: none; }
+.privacy-notice-left { display: flex; align-items: flex-start; gap: 9px; }
+.privacy-notice-left .icon { color: var(--accent, #00d084); flex-shrink: 0; margin-top: 1px; }
+.privacy-notice-left strong { color: var(--text, #e2e8f0); font-weight: 600; }
+.privacy-notice-left a { color: var(--accent, #00d084); text-decoration: none; white-space: nowrap; }
+.privacy-notice-left a:hover { text-decoration: underline; }
+.privacy-dismiss {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted, #4a5568); padding: 2px; flex-shrink: 0;
+  transition: color 0.15s;
+}
+.privacy-dismiss:hover { color: var(--text-2, #94a3b8); }
+
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 :root {
   --bg:            #0a0f1a;

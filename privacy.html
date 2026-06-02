@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kazi Alert — Privacy Policy</title>
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --surface: #111827;
+      --border: #253044;
+      --accent: #00d084;
+      --text: #e2e8f0;
+      --text-2: #94a3b8;
+      --text-muted: #4a5568;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+    header { margin-bottom: 48px; }
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: rgba(0,208,132,0.1);
+      border: 1px solid rgba(0,208,132,0.25);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .logo-name { font-size: 22px; font-weight: 700; color: var(--accent); }
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .meta { font-size: 13px; color: var(--text-muted); }
+
+    section { margin-bottom: 40px; }
+    h2 {
+      font-size: 16px; font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    p { color: var(--text-2); margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .card-body  { font-size: 13px; color: var(--text-2); }
+    .card-dest  { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .card-dest a { color: var(--accent); text-decoration: none; }
+    .card-dest a:hover { text-decoration: underline; }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      margin-right: 6px;
+    }
+    .tag--local  { background: rgba(74,222,128,0.1); color: #4ade80; }
+    .tag--third  { background: rgba(251,191,36,0.1); color: #fbbf24; }
+    .tag--own    { background: rgba(0,208,132,0.1);  color: #00d084; }
+    .tag--never  { background: rgba(248,113,113,0.1);color: #f87171; }
+
+    ul { color: var(--text-2); padding-left: 20px; }
+    ul li { margin-bottom: 6px; font-size: 14px; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 60px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">⚡</div>
+      <span class="logo-name">Kazi Alert</span>
+    </div>
+    <h1>Privacy Policy</h1>
+    <div class="meta">Effective date: 2 June 2026 &nbsp;·&nbsp; Built by Isaac Bakari Juma, Jaribu Tech Solutions</div>
+  </header>
+
+  <section>
+    <h2>The short version</h2>
+    <p>Kazi Alert is a personal job-hunting tool. <strong>Your CV and personal data never reach our servers</strong> — we don't have any. The extension stores everything locally on your device and connects only to the third-party APIs you configure yourself (Groq and Resend), using your own API keys.</p>
+  </section>
+
+  <section>
+    <h2>What data is used and where it goes</h2>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag tag--local">Local only</span>
+        CV text
+      </div>
+      <div class="card-body">Your CV is stored in <code>chrome.storage.local</code> — on your device only, never uploaded to any server controlled by Kazi Alert. It is sent to Groq's API solely to compute a match score against each job listing, on demand, using your own Groq API key.</div>
+      <div class="card-dest">Sent to: <a href="https://groq.com/privacy-policy/" target="_blank">Groq, Inc.</a> — subject to their privacy policy. You can delete your CV at any time from Options → Your CV → Remove.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag tag--local">Local only</span>
+        Alert email address
+      </div>
+      <div class="card-body">Your email address is stored locally and passed to Resend solely to deliver job alert emails, using your own Resend API key.</div>
+      <div class="card-dest">Sent to: <a href="https://resend.com/legal/privacy-policy" target="_blank">Resend, Inc.</a> — subject to their privacy policy.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag tag--own">Your own service</span>
+        Applied jobs (Job Tracker)
+      </div>
+      <div class="card-body">When you click "Mark Applied" or use the manual log form, the job title, company name, and date are written to a Google Sheet via a Google Apps Script you deploy yourself. This script runs under your own Google account — Kazi Alert never has access to your sheet.</div>
+      <div class="card-dest">Sent to: Your own Google Apps Script endpoint, governed by <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag tag--local">Local only</span>
+        Scan logs, match history, seen jobs
+      </div>
+      <div class="card-body">Scan activity logs, your match history, and the list of already-seen job IDs are stored only in <code>chrome.storage.local</code>. They are never transmitted anywhere.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="tag tag--never">Never collected</span>
+        Browsing history &amp; page content
+      </div>
+      <div class="card-body">Content scripts run on job pages you visit to passively detect job listings. They read only job-related fields (title, company, description, apply link) from the current page. No browsing history, form data, passwords, or unrelated page content is ever read or stored.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>API keys</h2>
+    <p>Kazi Alert uses a <strong>Bring Your Own Key</strong> model. You create your own accounts with Groq and Resend, generate API keys, and paste them into the extension. Your keys are stored in <code>chrome.storage.local</code> and are never transmitted to or stored by the developer of this extension.</p>
+    <p>Keep your API keys private. If you believe a key has been compromised, revoke it immediately in the respective provider's dashboard.</p>
+  </section>
+
+  <section>
+    <h2>Permissions used and why</h2>
+    <ul>
+      <li><strong>storage</strong> — save your CV, settings, and scan history locally</li>
+      <li><strong>alarms</strong> — run scheduled scans at the interval you choose</li>
+      <li><strong>tabs &amp; scripting</strong> — inject a passive content script to read job listings on pages you visit</li>
+      <li><strong>notifications</strong> — show a system notification when matches are found</li>
+      <li><strong>offscreen</strong> — create a hidden document with DOM access to parse HTML/RSS job feeds in the background</li>
+      <li><strong>host_permissions (all URLs)</strong> — fetch job listings from the many different job board and company career page URLs you configure, including custom URLs you add yourself. No page content is stored or transmitted beyond what is needed for matching.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Data retention and deletion</h2>
+    <p>All data is stored in your browser's local storage. You can delete any or all of it at any time:</p>
+    <ul>
+      <li><strong>CV</strong> — Options → Your CV → Remove</li>
+      <li><strong>Match history</strong> — Options → Match History → Clear all</li>
+      <li><strong>Scan logs</strong> — Options → Scan Logs → Clear</li>
+      <li><strong>All data</strong> — Uninstall the extension. Chrome automatically deletes all <code>chrome.storage.local</code> data for uninstalled extensions.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Children's privacy</h2>
+    <p>Kazi Alert is not directed at children under 13. We do not knowingly collect personal information from children.</p>
+  </section>
+
+  <section>
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes materially, we will update the effective date at the top of this page and update the extension in the Chrome Web Store. Continued use of the extension after changes constitutes acceptance of the revised policy.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about this privacy policy? Open an issue on <a href="https://github.com/BakariJuma1/Kazialert/issues" target="_blank">GitHub</a> or email <a href="mailto:jumaisaq@gmail.com">jumaisaq@gmail.com</a>.</p>
+  </section>
+
+  <footer>
+    Kazi Alert is open source · <a href="https://github.com/BakariJuma1/Kazialert" target="_blank">github.com/BakariJuma1/Kazialert</a>
+  </footer>
+
+</div>
+</body>
+</html>

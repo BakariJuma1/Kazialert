@@ -43,7 +43,14 @@ function _json(d) {
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAll();
   bindEvents();
+  initPrivacyNotice();
 });
+
+async function initPrivacyNotice() {
+  const dismissed = await Storage.getOne('privacy_notice_dismissed', false);
+  if (dismissed) $('privacyNotice').classList.add('hidden');
+}
+
 
 // ── Load ──────────────────────────────────────────────────────────────────────
 
@@ -280,6 +287,11 @@ function bindEvents() {
     await Storage.remove([STORAGE_KEYS.MATCHED_JOBS]);
     renderHistory([], await Storage.getOne(STORAGE_KEYS.APPLIED_JOBS, {}));
     toast('History cleared');
+  });
+
+  $('privacyDismiss').addEventListener('click', async () => {
+    $('privacyNotice').classList.add('hidden');
+    await Storage.setOne('privacy_notice_dismissed', true);
   });
 
   $('clearLogsBtn').addEventListener('click', async () => {
