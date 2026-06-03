@@ -54,6 +54,28 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       return true;
 
     // Sheets calls route through the service worker so they bypass CORS preflight
+    case 'ENSURE_OFFSCREEN':
+      ensureOffscreen()
+        .then(() => sendResponse({ ok: true }))
+        .catch(err => sendResponse({ ok: false, error: err.message }));
+      return true;
+
+    case 'PARSE_PDF':
+      // Options page can't reliably run pdf.js workers — route through offscreen doc
+      ensureOffscreen()
+        .then(() => new Promise((resolve, reject) => {
+          chrome.runtime.sendMessage(
+            { target: 'offscreen', type: 'PARSE_PDF', base64: msg.base64 },
+            res => {
+              if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+              else resolve(res);
+            }
+          );
+        }))
+        .then(sendResponse)
+        .catch(err => sendResponse({ ok: false, error: err.message }));
+      return true;
+
     case 'MARK_APPLIED':
       markApplied(msg.job)
         .then(result => sendResponse({ ok: true, result }))

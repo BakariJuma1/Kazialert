@@ -1,142 +1,144 @@
-// Runs only in popup/options page context — uses FileReader and DOM APIs
+// Options page context only — full browser APIs available.
+// PDF text extraction uses only browser built-ins: TextDecoder + DecompressionStream.
+// Works for text-based PDFs (Word exports, Google Docs exports, etc.).
+// Scanned / image-only PDFs will fall through to the "paste text" error.
 
-export function extractCVText(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return reject(new Error('No file provided'));
+export async function extractCVText(file) {
+  if (!file) throw new Error('No file provided');
 
-    if (file.type === 'application/pdf') {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const text = await extractTextFromPDF(e.target.result);
-          if (!text || text.length < 50) {
-            reject(new Error('PDF text extraction failed — please paste your CV text instead.'));
-          } else {
-            resolve(text);
-          }
-        } catch {
-          reject(new Error('Could not parse PDF. Please paste your CV text instead.'));
-        }
-      };
-      reader.onerror = () => reject(new Error('Could not read file.'));
-      reader.readAsArrayBuffer(file);
-    } else {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = () => reject(new Error('Could not read file.'));
-      reader.readAsText(file);
+  if (file.type === 'application/pdf') {
+    const buffer = await file.arrayBuffer();
+    const text   = await extractPDFText(buffer);
+    if (!text || text.length < 50) {
+      throw new Error(
+        'Could not extract text from this PDF — it may be a scanned image. Please paste your CV text directly.'
+      );
     }
+    return text;
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader  = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('Could not read file.'));
+    reader.readAsText(file);
   });
 }
 
-async function extractTextFromPDF(buffer) {
-  const bytes = new Uint8Array(buffer);
+// ── PDF extraction ────────────────────────────────────────────────────────────
+
+async function extractPDFText(buffer) {
+  const bytes  = new Uint8Array(buffer);
   const latin1 = new TextDecoder('latin1').decode(bytes);
+  const parts  = [];
 
-  // Try uncompressed BT/ET streams first (simple PDFs)
-  const plain = extractBTET(latin1);
-  if (plain.length >= 50) return plain;
-
-  // Fall back to decompressing FlateDecode streams (modern PDFs)
-  return extractCompressedStreams(bytes, latin1);
-}
-
-// ── Uncompressed PDF text ─────────────────────────────────────────────────────
-
-function extractBTET(str) {
-  const parts = [];
-  const btEt = /BT([\s\S]*?)ET/g;
-  let block;
-  while ((block = btEt.exec(str)) !== null) {
-    extractTJFromBlock(block[1], parts);
-  }
-  return parts.join(' ').replace(/\s+/g, ' ').trim();
-}
-
-function extractTJFromBlock(content, parts) {
-  const tj = /\(([^)]*)\)\s*T[jJ]/g;
-  let m;
-  while ((m = tj.exec(content)) !== null) {
-    parts.push(m[1].replace(/\\(\d{3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8))));
-  }
-  const tjArr = /\[((?:[^[\]]*\([^)]*\)[^[\]]*)*)\]\s*TJ/g;
-  let arr;
-  while ((arr = tjArr.exec(content)) !== null) {
-    const inner = arr[1].replace(/\(([^)]*)\)/g, (_, t) => t + ' ');
-    parts.push(inner.trim());
-  }
-}
-
-// ── FlateDecode compressed streams ────────────────────────────────────────────
-
-async function extractCompressedStreams(bytes, str) {
-  const parts = [];
-
-  // Find each 'stream' keyword and its surrounding dictionary
+  // Walk every stream object in the PDF.
+  // Each stream starts with "stream\r\n" or "stream\n" and ends at "endstream".
   const streamRe = /stream\r?\n/g;
   let m;
-  while ((m = streamRe.exec(str)) !== null) {
+
+  while ((m = streamRe.exec(latin1)) !== null) {
     const dataStart = m.index + m[0].length;
+    const dataEnd   = latin1.indexOf('endstream', dataStart);
+    if (dataEnd === -1) continue;
 
-    const endIdx = str.indexOf('endstream', dataStart);
-    if (endIdx === -1) continue;
+    // Peek at the dictionary before this stream to detect the filter.
+    const lookback = latin1.slice(Math.max(0, m.index - 600), m.index);
+    const isFlate  = /\/FlateDecode/.test(lookback);
+    const hasOther = /\/Filter/.test(lookback) && !isFlate;
+    if (hasOther) continue; // unsupported filter (e.g. DCTDecode for images)
 
-    // Check 200 chars before 'stream' keyword for FlateDecode filter
-    const dictSnippet = str.slice(Math.max(0, m.index - 200), m.index);
-    if (!/\/FlateDecode|\/Fl\b/.test(dictSnippet)) continue;
-
-    // Trim trailing CR/LF before 'endstream'
-    let dataEnd = endIdx;
-    if (str[dataEnd - 1] === '\n') dataEnd--;
-    if (str[dataEnd - 1] === '\r') dataEnd--;
-
-    // latin1 → byte positions are 1:1
-    const compressed = bytes.slice(dataStart, dataEnd);
-    if (compressed.length < 4) continue;
-
-    try {
-      const decompressed = await deflateDecompress(compressed);
-      const text = extractBTET(decompressed);
-      if (text) parts.push(text);
-    } catch {
-      // skip stream that fails to decompress
+    let content;
+    if (isFlate) {
+      try {
+        const compressed  = bytes.slice(dataStart, dataEnd);
+        const decompressed = await flateDecode(compressed);
+        content = new TextDecoder('latin1').decode(decompressed);
+      } catch {
+        continue;
+      }
+    } else {
+      content = latin1.slice(dataStart, dataEnd);
     }
+
+    const text = pullTextFromStream(content);
+    if (text) parts.push(text);
   }
 
-  return parts.join(' ').replace(/\s+/g, ' ').trim();
+  return parts.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
-async function deflateDecompress(data) {
-  // PDF FlateDecode = zlib-wrapped deflate (2-byte header: 0x78 0x__)
-  // Try stripping zlib header first, then fall back to raw deflate
-  const candidates = data[0] === 0x78 ? [data.slice(2), data] : [data, data.slice(2)];
-
-  for (const d of candidates) {
+// Decompress a FlateDecode (zlib) stream using the browser's built-in API.
+async function flateDecode(data) {
+  // zlib streams start with a 2-byte header; strip it for raw deflate fallback.
+  for (const format of ['deflate', 'deflate-raw']) {
     try {
-      const ds = new DecompressionStream('deflate-raw');
+      const ds     = new DecompressionStream(format);
       const writer = ds.writable.getWriter();
       const reader = ds.readable.getReader();
 
-      writer.write(d);
-      writer.close();
+      // Write async; ignore backpressure errors on bad streams.
+      writer.write(data).catch(() => {});
+      writer.close().catch(() => {});
 
       const chunks = [];
-      for (;;) {
+      while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         chunks.push(value);
       }
 
       const total = chunks.reduce((n, c) => n + c.length, 0);
-      const out = new Uint8Array(total);
-      let offset = 0;
-      for (const c of chunks) { out.set(c, offset); offset += c.length; }
-
-      return new TextDecoder('latin1').decode(out);
+      const out   = new Uint8Array(total);
+      let off = 0;
+      for (const c of chunks) { out.set(c, off); off += c.length; }
+      return out;
     } catch {
-      continue;
+      // Try the next format.
     }
   }
-
   throw new Error('Decompression failed');
+}
+
+// Pull text strings out of a PDF content stream (BT … ET blocks).
+function pullTextFromStream(content) {
+  const parts  = [];
+  const btEt   = /\bBT\b([\s\S]*?)\bET\b/g;
+  let blockM;
+
+  while ((blockM = btEt.exec(content)) !== null) {
+    const block     = blockM[1];
+    const lineParts = [];
+
+    // Match (string) Tj  and  [(str|-kern) …] TJ
+    const opRe = /\(([^)\\]*(?:\\.[^)\\]*)*)\)\s*(?:Tj|'|"|\")|\[([^\]]*)\]\s*TJ/g;
+    let op;
+
+    while ((op = opRe.exec(block)) !== null) {
+      if (op[1] !== undefined) {
+        lineParts.push(unescapePDF(op[1]));
+      } else if (op[2] !== undefined) {
+        const strRe = /\(([^)\\]*(?:\\.[^)\\]*)*)\)/g;
+        let s;
+        while ((s = strRe.exec(op[2])) !== null) {
+          lineParts.push(unescapePDF(s[1]));
+        }
+      }
+    }
+
+    if (lineParts.length > 0) parts.push(lineParts.join(''));
+  }
+
+  return parts.join('\n');
+}
+
+function unescapePDF(s) {
+  return s
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\\(/g, '(')
+    .replace(/\\\)/g, ')')
+    .replace(/\\\\/g, '\\')
+    .replace(/\\([0-7]{3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8)));
 }
